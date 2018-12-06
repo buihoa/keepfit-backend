@@ -16,8 +16,6 @@ const UserSchema = new Schema({
     macro: {protein: {type: Number}, carb: {type: Number}, fat: {type: Number}}
 });
 
-
-
 function validator (input) {
     const workoutIntensity =  ['0', '1-2', '3-4', '>5']
     input = input.toLowerCase
@@ -29,7 +27,7 @@ UserSchema.pre("save", function(next){
     next();
 })
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("user", UserSchema);
 
 //TODO: gender
 //TODO: validator for Goal

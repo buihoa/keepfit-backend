@@ -25,17 +25,21 @@ const addUser = ({name, avatar, intro, goal, weight, height, workoutHabit, bodyF
     new Promise ((resolve, reject) {
     userModel.create({name, avatar, intro, goal, weight, height, workoutHabit, bodyFat})
     .then(data => {
-        
+        const macro = macroCalculated(data.goal, data.weight, data.bodyFat, data.workoutHabit)
+        data.update({macro: macro})
     })
     .then(data => resolve({id: data._id}))
     .catch(err => reject(err));
     });
 
-const macroCalculated = (goal, height, weight, bodyFat, workoutHabit) => {
-    const macro =  {kcal, protein, carb, fat} 
-
+const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
+    const maintainKcal
     if(goal === 'loseFat') {
-        const fatMass = weight * bodyFat
+        const lean = weight * (1-bodyFat)
+        
+        if(workoutHabit === '0' || workoutHabit === '1-2') maintainKcal = weight * 15 * 2
+        if(workoutHabit === '3-4' || workoutHabit === '>5') maintainKcal = weight * 17 *2
+
         const fatLossPercent
         if(weight < 55) fatLossPercent = 0.06
         else if(55<= weight && weight < 80) fatLossPercent = 0.08
@@ -47,6 +51,18 @@ const macroCalculated = (goal, height, weight, bodyFat, workoutHabit) => {
         const weightLossPerWeek = totalBodyWeightLoss * 0.8/100
 
         const calorieDeficit = (weightLossPerWeek*(0.713*0.87*9 + 0.287*0.3*4))/7
+        const protein = 2.3 * lean
+        const finalKcal = maintainKcal - calorieDeficit
+        var fat = 50;
+        var carb = 100
+        var remainK = finalKcal
+        while(carb < fat 
+            || remainK < (maintainKcal - 100) || remainK > (maintainKcal + 100)) {
+            fat = Math.floor(Math.random() * 150)
+            carb = Math.floor(Math.random() * 300)
+            remainK = finalKcal - 4*carb - 9*fat
+        }
+        return {finalKcal, protein, carb, fat}
     }
 }
 
@@ -73,6 +89,8 @@ const deleteUser = ({id}) =>
         .then(data => resolve({id: data_id}))
         .catch(err => reject(err));
     });
+
+    
 
 module.exports = {
     addUser, getOneUser, getAllUsers, deleteUser, updateUser

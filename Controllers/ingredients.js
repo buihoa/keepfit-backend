@@ -88,7 +88,6 @@ const updateIngredient = (id) => {
     });
 }
 
-
 module.exports = {
     addIngredient, deleteIngredient, viewAllIngredients, viewSomeIngredientbyName, viewSomeIngredientbyKcal, viewOneIngredient, updateIngredient
 }

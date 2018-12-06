@@ -16,6 +16,7 @@ const userRouter = require("./Routers/UserRouter");
 const ingredientRouter = require("./Routers/IngredientRouter");
 const foodRouter = require("./Routers/FoodRouter");
 const authRouter = require("./routers/AuthRouter");
+const menuRouter = require("./routers/MenuRouter");
 
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}))
@@ -58,6 +59,7 @@ app.use("/api/user", userRouter);
 app.use("/api/food", foodRouter);
 app.use("/api/ingredient", ingredientRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/menu", menuRouter);
 
 app.get("/api", (req, res) => {
     req.session.username = "dongonson"
