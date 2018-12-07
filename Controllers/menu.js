@@ -14,7 +14,7 @@ const getAllMenu = ({user}) => new Promise((resolve, reject) => {
     .limit(7)
     .sort({date: 1})
     .select("-modified")
-    .populate('menu.itemID', 'foodName ingreList totalKcal protein carb fat')
+    .populate('menu.foodID', 'foodName ingreList totalKcal protein carb fat')
     .exec()
     .then(data => resolve(date))
     .catch(err => reject(err))
@@ -23,7 +23,7 @@ const getAllMenu = ({user}) => new Promise((resolve, reject) => {
 const getOneMenu = ({user, date}) => new Promise((resolve, reject) => {
     menuModel.findOne({user, date})
     .select("-modified")
-    .populate('menu.itemID', 'foodName ingreList totalKcal protein carb fat')
+    .populate('menu.foodID', 'foodName ingreList totalKcal protein carb fat')
     .exec()
     .then(data => resolve(data.menu))
     .catch(err => reject(err))

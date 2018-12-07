@@ -14,7 +14,7 @@ const adjustMacro = (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat
             })
         }
 
-        const {curTotalKcal, curProtein, curCarb, curFat} = defaultNutrition(foodIDs)
+        const {curTotalKcal, curProtein, curCarb, curFat} = defaultNutrition(foodQueries)
 
         const gapProtein  = curProtein - macroProtein
         let gapKcal = curTotalKcal - macroTotalKcal
@@ -33,23 +33,32 @@ const adjustMacro = (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat
 
 
         //Case when over/not enough Calorie
-        
+
+
 
         resolve()
     })
 
-const defaultNutrition = async (foodIDs) => {
+
+function updateFoodQueries(foodQueries, mark, id, newServing) {
+
+}
+
+const defaultNutrition = async (foodQueries) => {
         var curProtein = 0
         var curCarb = 0 
         var curFat = 0
-        for(var i = 0; i < foodIDs.length; i++) {
-                let ingreQuery = await ingredientModel.findById({_id: foodIDs[i]}, (err, ingreFound) => {
+        for(var i = 0; i < foodQueries.length; i++) {
+            for(var j = 0; j < foodQueries[i].ingreList.length; j++) {
+                let ingreQuery = await ingredientModel.findById({_id: foodQueries[i].ingreList[j].ingredientID}, 
+                    (err, ingreFound) => {
                     protein = protein + ingreFound.protein
                     carb = carb + ingreFound.carb
                     fat = fat + ingreFound.fat
                 })
             }
-        const totalKcal = 4*(carb + protein) + 9*fat
+            }
+        const curTotalKcal = 4*(carb + protein) + 9*fat
         return {curTotalKcal, curProtein, curCarb, curFat}
     }
 
@@ -97,12 +106,15 @@ async function stepOne(sourceArray, gapProtein) { //sourceArray [[ingreId, flag]
 //Change fat-rich items
 async function stepTwo (sourceArray, gapKcal) {
     let count = 0
-    let 
+    _.flatten(sourceArray)
+    let i = 0
     while(count < gapKcal) {
-        let query = ingredientModel.findById(sourceArray.ingredientID)
-
-        query
+        _.orderBy(sourceArray, "fat")
+        count = count + 9*sourceArray[i]
+        i++
     }
+
+    return 
 }
 
 function filterFoodProtein(foodArray) {
