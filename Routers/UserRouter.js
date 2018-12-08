@@ -25,10 +25,9 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-
     userController
     .addUser(req.body)
-    .then(id => res(id))
+    .then(id => res.send(id))
     .catch(err => {
         console.log(err)
         res.status(500).send(err)

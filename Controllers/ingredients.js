@@ -17,7 +17,7 @@ const addIngredient = ({name,unit,kcalPerUnit,protein,fat,carb,fiber}) =>
         .catch(err => reject(err));
         });
 
-const deleteIngredient = (id) => {
+const deleteIngredient = (id) => 
     new Promise((resolve, reject) => {
         ingredientModel
         .deleteOne(id)
@@ -25,7 +25,6 @@ const deleteIngredient = (id) => {
         .then(data => resolve(data._id))
         .catch(err => reject(err));
     });
-};
 
 const viewSomeIngredientbyName = ({name}) =>
     new Promise((resolve, reject) => {
@@ -48,7 +47,7 @@ const viewSomeIngredientbyKcal = ({kcalPerUnit}) =>
         .catch(err => reject(err))
     })
 
-const viewAllIngredients = () => {
+const viewAllIngredients = () => 
     new Promise ((resolve, reject) => {
         ingredientModel.find({active: true})
         .sort({kcalPerUnit: 'asc'})
@@ -57,9 +56,9 @@ const viewAllIngredients = () => {
         .then(data => resolve({id:data})) //TODO: Look at this later
         .catch(err => reject(err))
     })
-}
 
-const viewOneIngredient = id => {
+
+const viewOneIngredient = id => 
     new Promise((resolve, reject) => {
         ingredientModel.findOne({name})
         .select('-active')
@@ -67,9 +66,9 @@ const viewOneIngredient = id => {
         .then(data => resolve(data))
         .catch(err => reject(err))
     })
-}
 
-const updateIngredient = (id) => {
+
+const updateIngredient = (id) => 
     new Promise((resolve, reject) => {
         const reqBody = {name, unit, kcalPerUnit, protein, fat, carb, fiber, active}
     ingredientModel.findOne({_id: id})
@@ -85,7 +84,7 @@ const updateIngredient = (id) => {
     .then(data => resolve(data))
     .catch(err => reject(err))
     });
-}
+
 
 module.exports = {
     addIngredient, deleteIngredient, viewAllIngredients, viewSomeIngredientbyName, viewSomeIngredientbyKcal, viewOneIngredient, updateIngredient

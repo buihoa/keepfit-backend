@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt-nodejs");
 
-mongoose.connect("mongodb://127.0.0.1/keep-fit", { useCreateIndex: true, useNewUrlParser: true }, (err) => {
+mongoose.connect("mongodb://minhco12:whysoserious1@ds056559.mlab.com:56559/keep-fit-techkids", { useCreateIndex: true, useNewUrlParser: true }, (err) => {
     if(err){
         console.log(err);
     } else{

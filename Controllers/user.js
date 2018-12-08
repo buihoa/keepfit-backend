@@ -1,4 +1,5 @@
 const userModel = require('../Models/User')
+const bcrypt = require("bcrypt-nodejs");
 
 const getAllUsers = page =>
     new Promise((resolve, reject) => {
@@ -29,15 +30,13 @@ const addUser = ({
         name, email, password
     }) => {
     const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync());
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         userModel.create({
                 name,
                 hashPassword,
                 email
             })
-            .then(data => resolve({
-                id: data._id
-            }))
+            .then(data => resolve(data))
             .catch(err => reject(err));
         }
     )
