@@ -25,6 +25,7 @@ const getFoodbyName = (name) => {
 })
 }
 
+
 const getFoodbyIngre = (ingredient) => {
     new Promise((resolve, reject) => {
         foodModel.find({ingreList: {$in: ingredient}}) //TODO: check lai phan array $in
@@ -79,5 +80,5 @@ const deleteFood = (id) => {
 }
 
 module.exports = {
-    addFood,getFoodbyName, deleteFood, updateFood, getAllFood, getFoodbyIngre, getFoodbyNutrition
+    addFood,getFoodbyName, deleteFood, updateFood, getAllFood, getFoodbyIngre, getFoodbyNutrition, getFoodByID
 }

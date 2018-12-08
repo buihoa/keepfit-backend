@@ -37,6 +37,7 @@ const viewSomeIngredientbyName = ({name}) =>
         .catch(err => reject(err))
     })
 
+
 const viewSomeIngredientbyKcal = ({kcalPerUnit}) =>
     new Promise((resolve, reject) => {
         ingredientModel.find({kcalPerUnit})

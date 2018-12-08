@@ -43,7 +43,6 @@ const addUser = ({
     )
     };
 
-    //TODO: ADD USER PROFILE
 
 const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
     let maintainKcal = 0
@@ -94,6 +93,7 @@ const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
 const testMACRO = macroCalculated(0, 70, 25, 1)
 console.log("TEST MACRO IS: ", testMACRO)
 
+//UPDATE PASSWORD
 const updateUser = (id, {
         name,
         avatar,
@@ -146,8 +146,6 @@ const deleteUser = ({
             }))
             .catch(err => reject(err));
     });
-
-
 
 module.exports = {
     addUser,
