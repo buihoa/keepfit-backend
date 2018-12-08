@@ -80,5 +80,5 @@ const deleteFood = (id) => {
 }
 
 module.exports = {
-    addFood,getFoodbyName, deleteFood, updateFood, getAllFood, getFoodbyIngre, getFoodbyNutrition, getFoodByID
+    addFood,getFoodbyName, deleteFood, updateFood, getAllFood, getFoodbyIngre, getFoodbyNutrition
 }
