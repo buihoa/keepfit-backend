@@ -69,19 +69,19 @@ const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
         const calorieDeficit = (weightLossPerWeek * 1000 * (0.713 * 0.87 * 9 + 0.287 * 0.3 * 4)) / 7
         console.log("Calorie Deficit: ", calorieDeficit)
         const protein = Math.floor(2.6 * lean)
-        const finalKcal = Math.floor(maintainKcal - calorieDeficit)
-        console.log("finalKcal is ", finalKcal)
+        const kcal = Math.floor(maintainKcal - calorieDeficit)
+
         let fat = 1
         let carb = 0
-        let remainK = finalKcal
+        let remainK = kcal
         while (carb < fat ||
-            remainK < (finalKcal - 100) || remainK > (finalKcal + 100)) {
+            remainK < (kcal - 100) || remainK > (kcal + 100)) {
             fat = Math.floor(Math.random() * 150)
             carb = Math.floor(Math.random() * 300)
             remainK = 4*(protein + carb) + 9*fat
             }
         return {
-            finalKcal,
+            kcal,
             protein,
             carb,
             fat
@@ -128,6 +128,12 @@ const updateUser = (id, {
                 for (key in reqBody) {
                     if (data[key] && reqBody[key]) data[key] = reqBody[key]
                 }
+
+                if(data[goal] && data[weight]
+                    && data[workoutHabit && data[bodyFat]]) {
+                        data.macro = macroCalculated(data[goal], data[weight], data[bodyFat], data[workoutHabit])
+                    }
+                
                 data.save()
             })
             .then(data => resolve({
