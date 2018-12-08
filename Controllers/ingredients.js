@@ -33,9 +33,7 @@ const viewSomeIngredientbyName = ({name}) =>
         .limit(30)
         .select('-active')
         .exec()
-        .then(data => resolve({
-            data.map()
-        }))
+        .then(data => resolve(data))
         .catch(err => reject(err))
     })
 

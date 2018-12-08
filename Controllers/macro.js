@@ -4,11 +4,11 @@ const menuModel = require('../Models/Menu')
 const _ = require('lodash')
 
 //Pass down the menu selected from Menu Controller
-const adjustMacro = (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat}) => { 
+const adjustMacro = async (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat}) => { 
     new Promise((resolve, reject) => {
         const foodQueries = []
         for(var i = 0; i < foodIDs.length; i ++) {
-            foodModel.findById({_id: foodIDs[i]}, (err, foodFound) => { //foodIDs[]
+            await foodModel.findById({_id: foodIDs[i]}, (err, foodFound) => { //foodIDs[]
                 if(!foodFound) reject("Invalid FoodID")
                 else foodQueries.push(foodFound.ingreList) // FoodQueries[foodItem from food Models]
             })
@@ -33,7 +33,11 @@ const adjustMacro = (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat
 
 
         //Case when over/not enough Calorie
+        foodQueries = stepTwo(foodQueries, fatSource, gapKcal).foodQueries
+        gapKcal = stepTwo(foodQueries, fatSource, gapKcal).gapKcal
 
+
+        //Case when needed to change Carb
 
 
         resolve()
@@ -104,17 +108,43 @@ async function stepOne(sourceArray, gapProtein) { //sourceArray [[ingreId, flag]
 }
 
 //Change fat-rich items
-async function stepTwo (sourceArray, gapKcal) {
+async function stepTwo (foodQueries, sourceArray, gapKcal) {
+
     let count = 0
     _.flatten(sourceArray)
     let i = 0
+    let result = []
+
+    if(gapKcal > 0) {
     while(count < gapKcal) {
-        _.orderBy(sourceArray, "fat")
+        _.orderBy(sourceArray, "fat", 'desc')
         count = count + 9*sourceArray[i]
+            result.push({idFat: sourceArray[i].ingredientID, serving: sourceArray[i].serving}])
+        console.log("Here is the fat selected", result)
         i++
+        }
+        gapKcal = gapKcal - count
     }
 
-    return 
+    if(gapKcal < 0) {
+        while(count < (-gapKcal)) {
+            _.orderBy(sourceArray, "fat", 'desc')
+            count = count + 9*sourceArray[i].fat
+                result.push({idFat: sourceArray[i].ingredientID, serving: sourceArray[i].serving})
+            console.log("Here is the fat selected", result)
+            i++
+            }
+            gapKcal = gapKcal + count
+    }
+    result.push(count) // the calorie reduced //gained
+
+    for(var i = 0 ; i < (result.length -1); i++) {
+        foodQueries.map(food => _.flatten(food).filter(ingre => ingreID !== result[i].idFat
+            && serving !== result[i].serving))
+    }
+    
+
+    return {foodQueries, gapKcal} // Has the ID of the fat to be removed and the id of it
 }
 
 function filterFoodProtein(foodArray) {

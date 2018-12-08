@@ -11,7 +11,7 @@ const UserSchema = new Schema({
     weight: {type: Number, required: true},
     height: {type: Number, required: true},
     workoutHabit: {type: String, default: '0',required: true,
-    validate: {validator: validator, message: props => `${props.value} is a wrong syntax`},
+    validate: {validator: validator, message: props => `${props.value} is a wrong syntax`}},
     bodyFat: {type: Number, required: true},
     macro: {protein: {type: Number}, carb: {type: Number}, fat: {type: Number}}
 });

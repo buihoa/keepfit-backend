@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const FoodSchema = new Schema({
     foodName: {type: String, required: true},
-    ingreList: {type: Array[[{ingredientID: {type: Schema.Types.ObjectId, 
+    ingreList: {type: [{ingredientID: {type: Schema.Types.ObjectId, 
         ref: 'ingredient', required: true}, 
         serving:{type: Number, default: 1, required: true} ,
         flag: {type: Number, 
@@ -13,11 +13,11 @@ const FoodSchema = new Schema({
             1: high protein,
             2: high carb,
             3: high fat,
-            4: cooking oil`}, required: true}
-    }]], required: true},
+            4: cooking oil`}, default: 0, required: true}
+    }], required: true},
     totalKcal: {type: Number} ,
     protein: {type: Number} ,
-    carb: {type: number},
+    carb: {type: Number},
     fat: {type: Number}
     })
 
