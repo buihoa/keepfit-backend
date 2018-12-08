@@ -4,15 +4,15 @@ const macroController = require('./macro')
 
 const addMenu = ({user, menu, date}) => new Promise((resolve, reject) => {
     menuModel.create({user, menu, date})
-    .then(data => resolve(data._id))
+    .then(data => resolve(data))
     .catch(err => reject(err))
 })
 
-const getAllMenu = ({user}) => new Promise((resolve, reject) => {
-    menuModel.find({user})
+const getAllMenu = (user) => new Promise((resolve, reject) => {
+    menuModel.find(user)
     .limit(7)
-    .sort({date: 1})
-    .populate('menu.foodIDs')
+    .populate('user')
+    .populate('foodIDs')
     .exec()
     .then(data => resolve(date))
     .catch(err => reject(err))
@@ -20,7 +20,8 @@ const getAllMenu = ({user}) => new Promise((resolve, reject) => {
 
 const getOneMenu = ({user, date}) => new Promise((resolve, reject) => {
     menuModel.findOne({user, date})
-    .populate('menu.foodIDs')
+    .populate('user')
+    .populate('foodIDs')
     .exec()
     .then(data => resolve(data.menu))
     .catch(err => reject(err))

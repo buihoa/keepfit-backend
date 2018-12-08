@@ -3,7 +3,8 @@ const router = express.Router();
 const menuController = require('../Controllers/menu')
 
 router.get("/", (req,res) => {
-    menuController.getAllMenu(req.body) 
+    menuController
+    .getAllMenu(req.body) 
     .then(allMenus => res.send(allMenus))
     .catch(err => {
         console.log(err)
