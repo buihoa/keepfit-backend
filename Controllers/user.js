@@ -128,8 +128,8 @@ const updateUser = (id, {
                 for (key in reqBody) {
                     if (data[key] && reqBody[key]) data[key] = reqBody[key]
                 }
+                data.save()
             })
-            data.save()
             .then(data => resolve({
                 data
             }))
