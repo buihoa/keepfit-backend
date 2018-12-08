@@ -55,10 +55,9 @@ router.post("/", (req, res) => {
 
 router.put("/:id",(req, res) => {
     var foodID = req.params.id;
-
     foodController
     .updateFood(foodID, req.body)
-    .then(id => res(id))
+    .then(id => res.send(id))
     .catch(err => {
         console.error(err);
         res.status(500).send(err);

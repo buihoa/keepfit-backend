@@ -1,4 +1,5 @@
 const foodModel = require('../Models/Food')
+const ingredientModel = require('../Models/Ingredient')
 
 const getAllFood = page => 
     new Promise((resolve, reject) => {
@@ -13,13 +14,23 @@ const getAllFood = page =>
 
 const getFoodbyID = (id) => 
     new Promise((resolve, reject) => {
-        foodModel.find({_id: id})
-        .sort({name: -1})
-        .limit(15)
-        .populate('ingreList', '_id name')
-        .select('-flag')
+        foodModel.findOne({_id: id})
+        .populate('ingreList.reference')
         .exec()
-    .then(data => resolve(data))
+    .then(data => {
+        data.totalKcal = 0
+        data.protein = 0
+        data.carb = 0
+        data.fat = 0
+        for(var i = 0; i < data.ingreList.length; i++ ) {
+            data.totalKcal = data.totalKcal + data.ingreList[i].reference.kcalPerUnit
+            data.protein = data.protein + data.ingreList[i].reference.protein
+            data.carb = data.carb + data.ingreList[i].reference.carb
+            data.fat = data.fat + data.ingreList[i].reference.fat
+        }
+        data.save()
+        resolve(data)
+    })
     .catch(err => reject(err))
 })
 
@@ -53,20 +64,30 @@ const getFoodbyIngre = (ingredient) => {
 
 const addFood = ({name, ingreList}) => 
     new Promise((resolve, reject) => {
-        console.log({name, ingreList})
         foodModel.create({name, ingreList})
     .then(data => resolve(data))
     .catch(err => reject(err))
 })
 
-const updateFood = (id, {name, ingreList, flag}) => 
+const updateFood = (id, {name, ingreList}) => 
     new Promise((resolve, reject) => {
-        const reqBody = {name, ingreList, flag}
-        foodModel
-        .findOne({_id: id})
-        .then(data => resolve({id: data._id}))
+        const reqBody = {name, ingreList}
+        getFoodbyID(id)
+        .then(data => {
+            if (data === null) {
+                res.status(404).json({
+                    success: 0,
+                    message: "Not found!"
+                })
+            }
+            for (key in reqBody) {
+                if (data[key] && reqBody[key]) data[key] = reqBody[key]
+            }
+            data.save()
+            resolve(data)
         .catch(err => reject(err))
     })
+})
 
 
 const deleteFood = (id) => 
@@ -75,7 +96,6 @@ const deleteFood = (id) =>
         .then(data => resolve({id: data}))
         .catch(err => reject(err))
     })
-
 
 module.exports = {
     addFood,getFoodbyID, deleteFood, updateFood, getAllFood
