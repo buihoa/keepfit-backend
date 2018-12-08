@@ -26,37 +26,24 @@ const getOneUser = id =>
     });
 
 const addUser = ({
-        name,
-        avatar,
-        intro,
-        goal,
-        weight,
-        height,
-        workoutHabit,
-        bodyFat
-    }) =>
+        name, email, password
+    }) => {
+    const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync());
     new Promise((resolve, reject) => {
         userModel.create({
                 name,
-                avatar,
-                intro,
-                goal,
-                weight,
-                height,
-                workoutHabit,
-                bodyFat
-            })
-            .then(data => {
-                const macro = macroCalculated(data.goal, data.weight, data.bodyFat, data.workoutHabit)
-                data.update({
-                    macro: macro
-                })
+                hashPassword,
+                email
             })
             .then(data => resolve({
                 id: data._id
             }))
             .catch(err => reject(err));
-    });
+        }
+    )
+    };
+
+    //TODO: ADD USER PROFILE
 
 const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
     let maintainKcal = 0

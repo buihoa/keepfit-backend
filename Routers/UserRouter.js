@@ -25,6 +25,7 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", (req, res) => {
+
     userController
     .addUser(req.body)
     .then(id => res(id))
