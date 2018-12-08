@@ -7,8 +7,7 @@ const ingredientSchema = new Schema({
     kcalPerUnit: {type: Number, require: true},
     protein: {type: Number, require: true},
     fat: {type: Number, require: true},
-    carb: {type: Number, require: true},
-    fiber: {type: Number, require: true},  
+    carb: {type: Number, require: true}, 
     active: {type: Boolean, default: true}
 })
 

@@ -12,7 +12,7 @@ const UserSchema = new Schema({
     height: {type: Number, required: true},
     workoutHabit: {type: String, default: '0',required: true},
     bodyFat: {type: Number, required: true},
-    macro: {protein: {type: Number}, carb: {type: Number}, fat: {type: Number}}
+    macro: {kcal: {type: Number}, protein: {type: Number}, carb: {type: Number}, fat: {type: Number}}
 });
 
 /* function validator (input) {

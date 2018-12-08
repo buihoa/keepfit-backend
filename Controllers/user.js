@@ -59,35 +59,42 @@ const addUser = ({
     });
 
 const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
-    var maintainKcal = 0
-    if (goal === 'loseFat') {
-        const lean = weight * (1 - bodyFat)
+    let maintainKcal = 0
+    if (goal === 0) {
+        const lean = weight * (1 - bodyFat/100)
 
-        if (workoutHabit === '0' || workoutHabit === '1-2') maintainKcal = weight * 15 * 2
-        if (workoutHabit === '3-4' || workoutHabit === '>5') maintainKcal = weight * 17 * 2
+        if (workoutHabit === 0 || workoutHabit === 1) maintainKcal = weight * 15 * 2
+        if (workoutHabit === 3 || workoutHabit === 5) maintainKcal = weight * 17 * 2
 
+        console.log("Maintain Kcal is ", maintainKcal)
         var fatLossPercent = 0
-        if (weight < 55) fatLossPercent = 0.06
-        else if (55 <= weight && weight < 80) fatLossPercent = 0.08
+        if (bodyFat < 22) fatLossPercent = 0.06
+        else if (23 <= bodyFat && bodyFat < 28) fatLossPercent = 0.08
         else fatLossPercent = 0.1
+        console.log("fatLossPercent: ", fatLossPercent)
 
         const fatLossWeight = weight * fatLossPercent
+        console.log("fat loss Weight is: ", fatLossWeight)
+
         const totalBodyWeightLoss = fatLossWeight / 0.713
+        console.log(totalBodyWeightLoss)
 
-        const weightLossPerWeek = totalBodyWeightLoss * 0.8 / 100
+        const weightLossPerWeek = weight * 0.7/100
 
-        const calorieDeficit = (weightLossPerWeek * (0.713 * 0.87 * 9 + 0.287 * 0.3 * 4)) / 7
-        const protein = 2.3 * lean
-        const finalKcal = maintainKcal - calorieDeficit
-        var fat = 50;
-        var carb = 100
-        var remainK = finalKcal
+        const calorieDeficit = (weightLossPerWeek * 1000 * (0.713 * 0.87 * 9 + 0.287 * 0.3 * 4)) / 7
+        console.log("Calorie Deficit: ", calorieDeficit)
+        const protein = Math.floor(2.6 * lean)
+        const finalKcal = Math.floor(maintainKcal - calorieDeficit)
+        console.log("finalKcal is ", finalKcal)
+        let fat = 1
+        let carb = 0
+        let remainK = finalKcal
         while (carb < fat ||
-            remainK < (maintainKcal - 100) || remainK > (maintainKcal + 100)) {
+            remainK < (finalKcal - 100) || remainK > (finalKcal + 100)) {
             fat = Math.floor(Math.random() * 150)
             carb = Math.floor(Math.random() * 300)
-            remainK = finalKcal - 4 * carb - 9 * fat
-        }
+            remainK = 4*(protein + carb) + 9*fat
+            }
         return {
             finalKcal,
             protein,
@@ -96,6 +103,9 @@ const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
         }
     }
 }
+
+const testMACRO = macroCalculated(0, 70, 25, 1)
+console.log("TEST MACRO IS: ", testMACRO)
 
 const updateUser = (id, {
         name,

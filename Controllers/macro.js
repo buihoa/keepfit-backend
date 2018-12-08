@@ -1,14 +1,17 @@
-/* const ingredientModel = require('../Models/Ingredient')
+const ingredientModel = require('../Models/Ingredient')
 const foodModel = require('../Models/Food')
 const menuModel = require('../Models/Menu')
 const _ = require('lodash')
 
+
+
+
 //Pass down the menu selected from Menu Controller
-const adjustMacro = async (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat}) => { 
+const adjustMacro = (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat}) => { 
     new Promise((resolve, reject) => {
         const foodQueries = []
         for(var i = 0; i < foodIDs.length; i ++) {
-            await foodModel.findById({_id: foodIDs[i]}, (err, foodFound) => { //foodIDs[]
+            foodModel.findById({_id: foodIDs[i]}, (err, foodFound) => { //foodIDs[]
                 if(!foodFound) reject("Invalid FoodID")
                 else foodQueries.push(foodFound.ingreList) // FoodQueries[foodItem from food Models]
             })
@@ -25,14 +28,26 @@ const adjustMacro = async (foodIDs, {macroTotalKcal, macroProtein, macroCarb, ma
         const oilSource = filterFoodOil(foodQueries)
         console.log("Protein, Carb, Fat, Oil: ", proteinSource, carbSource, fatSource, oilSource)
 
-        let gapKcal = curTotalKcal - macroTotalKcal
+        if(curProtein >= macroProtein - 5 
+            && curProtein <= macroProtein + 5
+            && curTotalKcal >= macroTotalKcal - 100
+            && curTotalKcal <= macroTotalKcal + 100) return foodIDs
 
         //Case when they lack Protein// over Protein
-        protein = stepOne(proteinSource, gapProtein).sourceArray
+        
+        proteinSource = stepOne(proteinSource, gapProtein).sourceArray
         gapKcal = gapKcal + stepOne(proteinSource, gapProtein).caloChangeProtein
 
-        //Case when over/not enough Calorie
+        console.log("Gap Kcal after Step 1 is: ", gapKcal)
 
+        if(curProtein >= macroProtein - 5 
+            && curProtein <= macroProtein + 5
+            && curTotalKcal >= macroTotalKcal - 100
+            && curTotalKcal <= macroTotalKcal + 100) return foodIDs
+
+        let gapKcal = curTotalKcal - macroTotalKcal
+
+        //Case when over/not enough Calorie
 
         //Case when needed to change Carb
 
@@ -40,6 +55,7 @@ const adjustMacro = async (foodIDs, {macroTotalKcal, macroProtein, macroCarb, ma
         resolve()
     })
 
+    adjustMacro()
 
 
 const defaultNutrition = async (foodQueries) => {
@@ -74,11 +90,11 @@ async function stepOne(sourceArray, gapProtein) { //sourceArray [{ingreId, servi
                 mostDiff.index = i
                 mostDiff.id = sourceArray[i][0]._id
         }
-       /*  if(sourceArray[i][0].protein - sourceArray[i][0].fat < leastDiff.diffProFat) {
+       if(sourceArray[i][0].protein - sourceArray[i][0].fat < leastDiff.diffProFat) {
             least.index = i
             leastDiff.id = sourceArray[i][0]._id
-        }    */
-    /*}
+        }    
+    }
 
         let ingreProtein = 0
         let caloChange = 0
@@ -97,47 +113,25 @@ async function stepOne(sourceArray, gapProtein) { //sourceArray [{ingreId, servi
         .catch(err => console.log(err))
 
         sourceArray[mostDiff.index][foodServingIndex].serving = mostDiff.serving
+        console.log("Fixed Protein Source Array",sourceArray)
         return {sourceArray, caloChangeProtein}
 }
 
 //Change fat-rich items
-async function stepTwo (foodQueries, sourceArray, gapKcal) {
+async function stepTwo (sourceArray, gapKcal) {
+    for(var i = 0; i < sourceArray.length; i ++) {
+        _.orderBy(sourceArray, 'fat', 'asc')
+    }
 
-    let count = 0
-    _.flatten(sourceArray)
-    let i = 0
-    let result = []
+    if(gapKcal < 0 ) {
+        
+    }
 
     if(gapKcal > 0) {
-    while(count < gapKcal) {
-        _.orderBy(sourceArray, "fat", 'desc')
-        count = count + 9*sourceArray[i]
-            result.push({idFat: sourceArray[i].ingredientID, serving: sourceArray[i].serving}])
-        console.log("Here is the fat selected", result)
-        i++
-        }
-        gapKcal = gapKcal - count
+
     }
 
-    if(gapKcal < 0) {
-        while(count < (-gapKcal)) {
-            _.orderBy(sourceArray, "fat", 'desc')
-            count = count + 9*sourceArray[i].fat
-                result.push({idFat: sourceArray[i].ingredientID, serving: sourceArray[i].serving})
-            console.log("Here is the fat selected", result)
-            i++
-            }
-            gapKcal = gapKcal + count
-    }
-    result.push(count) // the calorie reduced //gained
-
-    for(var i = 0 ; i < (result.length -1); i++) {
-        foodQueries.map(food => _.flatten(food).filter(ingre => ingreID !== result[i].idFat
-            && serving !== result[i].serving))
-    }
-    
-
-    return {foodQueries, gapKcal} // Has the ID of the fat to be removed and the id of it
+    return {sourceArray, gapKcal} // Has the ID of the fat to be removed and the id of it
 }
 
 
@@ -156,4 +150,4 @@ function filterFoodOil(foodArray) {
 
 module.exports = {
     nutritionFactByDay
-} */
+} 
