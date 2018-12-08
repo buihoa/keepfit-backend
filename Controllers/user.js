@@ -19,8 +19,8 @@ const getOneUser = id =>
         userModel.findOne({
                 _id: id
             })
-            .select('-hashPassword')
             .limit(1)
+            .select('-hashPassword')
             .exec()
             .then(data => resolve(data))
             .catch(err => reject(err))
@@ -102,18 +102,19 @@ const updateUser = (id, {
         height,
         workoutHabit,
         bodyFat
-    }) =>
-    new Promise((resolve, reject) => {
-        const reqBody = {
-            name,
-            avatar,
-            intro,
-            goal,
-            weight,
-            height,
-            workoutHabit,
-            bodyFat
-        }
+    }) => {
+
+    const reqBody = {
+        name,
+        avatar,
+        intro,
+        goal,
+        weight,
+        height,
+        workoutHabit,
+        bodyFat
+    }
+    return new Promise((resolve, reject) => {
         userModel.findOne({
                 _id: id
             })
@@ -127,13 +128,15 @@ const updateUser = (id, {
                 for (key in reqBody) {
                     if (data[key] && reqBody[key]) data[key] = reqBody[key]
                 }
-                data.save().exec()
             })
+            data.save()
             .then(data => resolve({
-                id: data._id
+                data
             }))
             .catch(err => reject(err));
-    });
+        })
+    };
+
 
 const deleteUser = ({
         id

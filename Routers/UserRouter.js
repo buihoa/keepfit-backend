@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
     userController
     .getOneUser(req.params.id)
-    .then(data => res(data))
+    .then(data => res.send(data))
     .catch(err => {
         console.error(err)
         res.status(500).send(err)
