@@ -1,6 +1,5 @@
-const ingredientModel = require('../Models/Ingredient')
+/* const ingredientModel = require('../Models/Ingredient')
 const foodModel = require('../Models/Food')
-const menuModel = require('../Models/Menu')
 const _ = require('lodash')
 const ingredientController = require('./ingredients')
 
@@ -12,7 +11,9 @@ const adjustMacro = (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat
             foodModel.findById({_id: foodIDs[i]}, (err, foodFound) => { //foodIDs[]
                 if(!foodFound) reject("Invalid FoodID")
                 else {
-                    foodFound.
+                    for(let j = 0; j < foodFound.ingreList.length; j++) {
+                        foodFound.ingreList[j] = ingredientController.viewOneIngredient(foodFound.ingreList[j].reference)
+                    }
                     foodQueries.push(foodFound) // FoodQueries[foodItem from food Models]
                 }
             })
@@ -172,5 +173,5 @@ function filterFoodOil(foodArray) {
 }
 
 module.exports = {
-    nutritionFactByDay
-}  
+    nutritionFactByDay, adjustMacro
+}    */

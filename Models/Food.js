@@ -10,7 +10,7 @@ const Material = new Schema({
 });
 
 const FoodSchema = new Schema({
-    name: {type: String, require: true, unique: true},
+    name: {type: String, require: true},
     ingreList: [Material],
     totalKcal: {type: Number} ,
     protein: {type: Number} ,

@@ -26,7 +26,7 @@ const deleteIngredient = (id) =>
         .catch(err => reject(err));
     });
 
-const viewSomeIngredientbyName = ({name}) =>
+/* const viewSomeIngredientbyName = ({name}) =>
     new Promise((resolve, reject) => {
         ingredientModel.find({name}) 
         .limit(30)
@@ -45,7 +45,7 @@ const viewSomeIngredientbyKcal = ({kcalPerUnit}) =>
         .exec()
         .then(data => resolve({id:data}))
         .catch(err => reject(err))
-    })
+}) */
 
 const viewAllIngredients = () => 
     new Promise ((resolve, reject) => {
@@ -87,5 +87,5 @@ const updateIngredient = (id) =>
 
 
 module.exports = {
-    addIngredient, deleteIngredient, viewAllIngredients, viewSomeIngredientbyName, viewSomeIngredientbyKcal, viewOneIngredient, updateIngredient
+    addIngredient, deleteIngredient, viewAllIngredients, viewOneIngredient, updateIngredient
 }

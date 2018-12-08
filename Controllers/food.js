@@ -11,21 +11,20 @@ const getAllFood = page =>
         .catch(err => reject(err))
     })
 
-const getFoodbyName = (name) => {
+const getFoodbyID = (id) => 
     new Promise((resolve, reject) => {
-        foodModel.find({name: name}) //TODO: check lai phan array $in
+        foodModel.find({_id: id})
         .sort({name: -1})
         .limit(15)
-        .populate('ingreList.reference', '_id name')
+        .populate('ingreList', '_id name')
         .select('-flag')
         .exec()
-    
-    .then(data => resolve({id: data._id}))
+    .then(data => resolve(data))
     .catch(err => reject(err))
 })
-}
 
 
+/* 
 const getFoodbyIngre = (ingredient) => {
     new Promise((resolve, reject) => {
         foodModel.find({ingreList: {$in: ingredient}}) //TODO: check lai phan array $in
@@ -34,13 +33,12 @@ const getFoodbyIngre = (ingredient) => {
         .populate('ingreList.reference', '_id name')
         .select('-flag')
         .exec()
-    
     .then(data => resolve({id:data}))
     .catch(err => reject(err))
 })
-}
+} */
 
-const getFoodbyNutrition = (flag) => {
+/* const getFoodbyNutrition = (flag) => {
     new Promise((resolve, reject) => {
         foodModel.find({flag}) //TODO: check lai phan array $in
         .sort({name: -1})
@@ -51,17 +49,17 @@ const getFoodbyNutrition = (flag) => {
     .then(id => resolve({id: _id}))
     .catch(err => reject(err))
 })
-}
+} */
 
-const addFood = ({name, ingreList, flag}) => {
+const addFood = ({name, ingreList}) => 
     new Promise((resolve, reject) => {
-        foodModel.create({name, ingreList, flag})
-    .then(data => resolve({id: data._id}))
+        console.log({name, ingreList})
+        foodModel.create({name, ingreList})
+    .then(data => resolve(data))
     .catch(err => reject(err))
 })
-}
 
-const updateFood = (id, {name, ingreList, flag}) => {
+const updateFood = (id, {name, ingreList, flag}) => 
     new Promise((resolve, reject) => {
         const reqBody = {name, ingreList, flag}
         foodModel
@@ -69,16 +67,16 @@ const updateFood = (id, {name, ingreList, flag}) => {
         .then(data => resolve({id: data._id}))
         .catch(err => reject(err))
     })
-}
 
-const deleteFood = (id) => {
+
+const deleteFood = (id) => 
     new Promise((resolve, reject) => {
         foodModel.deleteOne({_id: id})
         .then(data => resolve({id: data}))
         .catch(err => reject(err))
     })
-}
+
 
 module.exports = {
-    addFood,getFoodbyName, deleteFood, updateFood, getAllFood, getFoodbyIngre, getFoodbyNutrition
+    addFood,getFoodbyID, deleteFood, updateFood, getAllFood
 }
