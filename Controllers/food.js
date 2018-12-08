@@ -6,7 +6,7 @@ const getAllFood = page =>
         foodModel.find()
         .limit(50)
         .skip((page - 1) *5)
-        .select('-flag')
+        .populate('ingreList.reference')
         .exec()
         .then(data => resolve(data))
         .catch(err => reject(err))

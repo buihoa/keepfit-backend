@@ -12,7 +12,7 @@ const getAllMenu = ({user}) => new Promise((resolve, reject) => {
     menuModel.find({user})
     .limit(7)
     .sort({date: 1})
-    .populate('menu.foodIDs', '_id name ingreList')
+    .populate('menu.foodIDs')
     .exec()
     .then(data => resolve(date))
     .catch(err => reject(err))
@@ -20,7 +20,7 @@ const getAllMenu = ({user}) => new Promise((resolve, reject) => {
 
 const getOneMenu = ({user, date}) => new Promise((resolve, reject) => {
     menuModel.findOne({user, date})
-    .populate('menu.foodIDs', '_id name ingreList')
+    .populate('menu.foodIDs')
     .exec()
     .then(data => resolve(data.menu))
     .catch(err => reject(err))
@@ -37,9 +37,6 @@ const updateMenu = (user, {date, foodIDs}) => new Promise((resolve, reject) => {
 })
 
 
-function nutritionFactByDay (menu) {
-
-}
 const deleteAllMenu = ({user}) => new Promise((resolve, reject) => {
     menuModel.findOneAndDelete({user})
     .then(data => resolve(data._id))

@@ -11,9 +11,6 @@ const adjustMacro = (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat
             foodModel.findById({_id: foodIDs[i]}, (err, foodFound) => { //foodIDs[]
                 if(!foodFound) reject("Invalid FoodID")
                 else {
-                    for(let j = 0; j < foodFound.ingreList.length; j++) {
-                        foodFound.ingreList[j] = ingredientController.viewOneIngredient(foodFound.ingreList[j].reference)
-                    }
                     foodQueries.push(foodFound) // FoodQueries[foodItem from food Models]
                 }
             })
@@ -96,17 +93,17 @@ const defaultNutrition = async (foodQueries) => {
 
 
 //Fixing Protein Intake
-async function stepOne(sourceArray, gapProtein) { //sourceArray [{{ingreId,}, serving, flag}]
+async function stepOne(sourceArray, gapProtein) { //sourceArray [[{reference: {}}, serving, flag},...],[],[]]
     const mostDiff = {index: 0, id: 0, serving: 0}
-    //const leastDiff = {index: 0, id: 0, serving: 0}
+    const leastDiff = {index: 0, id: 0, serving: 0}
 
 
     for(let i = 0; i < sourceArray.length; i++) {
-        _.orderBy(sourceArray[i], function(o) {return (o.protein - o.fat)}, 'asc')
+        _.orderBy(sourceArray[i], function(o) {return (o.reference.protein - o.reference.fat)}, 'asc')
     }
 
-    for(let i = 0; i < sourceArray.length(); i++ ) {
-        let ingreQuery = await ingredientModel.findById(sourceArray[i][0].reference)
+
+    for(let i = 0; i < sourceArray.length; i++ ) {
         if(ingreQuery.protein - ingreQuery.fat > mostDiff.diffProFat) {
                 mostDiff.index = i
                 mostDiff.id = ingreQuery.reference
@@ -174,4 +171,4 @@ function filterFoodOil(foodArray) {
 
 module.exports = {
     nutritionFactByDay, adjustMacro
-}    */
+}     */

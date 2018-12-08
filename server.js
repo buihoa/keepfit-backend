@@ -15,8 +15,8 @@ mongoose.connect("mongodb://minhco12:whysoserious1@ds056559.mlab.com:56559/keep-
 const userRouter = require("./Routers/UserRouter");
 const ingredientRouter = require("./Routers/IngredientRouter");
 const foodRouter = require("./Routers/FoodRouter");
-const authRouter = require("./routers/AuthRouter");
-const menuRouter = require("./routers/MenuRouter");
+const authRouter = require("./Routers/AuthRouter");
+const menuRouter = require("./Routers/MenuRouter");
 
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}))
