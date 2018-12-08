@@ -1,5 +1,5 @@
-const menuModel = require('../models/Menu')
-const moment = require('moment')
+const menuModel = require('../Models/Menu')
+//const moment = require('moment')
 const macroController = require('./macro')
 
 const addMenu = ({user, menu, date}) => new Promise((resolve, reject) => {
@@ -40,7 +40,7 @@ const updateMenu = (user, {date, foodIDs}) => new Promise((resolve, reject) => {
 
 
 function nutritionFactByDay (menu) {
-    
+
 }
 const deleteAllMenu = ({user}) => new Promise((resolve, reject) => {
     menuModel.findOneAndDelete({user})

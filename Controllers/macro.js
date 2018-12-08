@@ -1,4 +1,4 @@
-const ingredientModel = require('../Models/Ingredient')
+/* const ingredientModel = require('../Models/Ingredient')
 const foodModel = require('../Models/Food')
 const menuModel = require('../Models/Menu')
 const _ = require('lodash')
@@ -14,27 +14,24 @@ const adjustMacro = async (foodIDs, {macroTotalKcal, macroProtein, macroCarb, ma
             })
         }
 
+        //Getting target in to const
         const {curTotalKcal, curProtein, curCarb, curFat} = defaultNutrition(foodQueries)
-
         const gapProtein  = curProtein - macroProtein
-        let gapKcal = curTotalKcal - macroTotalKcal
+        
 
-        const proteinSource = filterFoodProtein(foodQueries)
+        let proteinSource = filterFoodProtein(foodQueries)
         const carbSource = filterFoodCarb(foodQueries)
         const fatSource = filterFoodFat(foodQueries)
         const oilSource = filterFoodOil(foodQueries)
         console.log("Protein, Carb, Fat, Oil: ", proteinSource, carbSource, fatSource, oilSource)
 
+        let gapKcal = curTotalKcal - macroTotalKcal
+
         //Case when they lack Protein// over Protein
-        const {markProtein, idProtein, caloChangeProtein, servingTimesProtein} = stepOne(proteinSource, gapProtein)
-        gapKcal = gapKcal + caloChangeProtein
-
-        foodQueries[markProtein].ingreList[idProtein].serving = servingTimesProtein
-
+        protein = stepOne(proteinSource, gapProtein).sourceArray
+        gapKcal = gapKcal + stepOne(proteinSource, gapProtein).caloChangeProtein
 
         //Case when over/not enough Calorie
-        foodQueries = stepTwo(foodQueries, fatSource, gapKcal).foodQueries
-        gapKcal = stepTwo(foodQueries, fatSource, gapKcal).gapKcal
 
 
         //Case when needed to change Carb
@@ -44,9 +41,6 @@ const adjustMacro = async (foodIDs, {macroTotalKcal, macroProtein, macroCarb, ma
     })
 
 
-function updateFoodQueries(foodQueries, mark, id, newServing) {
-
-}
 
 const defaultNutrition = async (foodQueries) => {
         var curProtein = 0
@@ -67,44 +61,43 @@ const defaultNutrition = async (foodQueries) => {
     }
 
 //Fixing Protein Intake
-async function stepOne(sourceArray, gapProtein) { //sourceArray [[ingreId, flag]]
-    const mostDiff = {id: 0, diff: 0, mark: 0, unit: 0}
-    const leastDiff = {id: 0, diff: 100, mark: 0, unit: 0}
+async function stepOne(sourceArray, gapProtein) { //sourceArray [{ingreId, serving, flag}]
+    const mostDiff = {index: 0, id: 0, serving: 0}
+    //const leastDiff = {index: 0, id: 0, serving: 0}
 
     for(var i = 0; i < sourceArray.length; i++) {
-        for(var j = 0; j < sourceArray[i].ingreList.length; j++)
-        var temp = await ingredientModel.find({_id: sourceArray[i].ingreList[j].ingredientID})
-        var comp = temp.protein - temp.fat
-        
-        if(comp > mostDiff.diff) {
-            mostDiff.id = j
-            mostDiff.diff = comp
-            mostDiff.mark = i
-        }
-
-        if(comp < leastDiff.diff) {
-            leastDiff.id = j
-            leastDiff.diff = comp  
-            leastDiff.mark = i
-        }
+        _.orderBy(sourceArray[i], function(o) {return (o.protein - o.fat)}, 'asc')
     }
-        const mostDiffQuerry = ingredientModel.find({_id: mostDiff.id})
-        const leastDiffQuerry = ingredientModel.find({_id: leastDiff.id})
 
-        if(gapProtein > 0) {
-            const caloChangeMostDiff = -gapProtein/mostDiff.unit * (mostDiffQuerry.protein * 4 + 9* mostDiffQuerry.fat + 4* mostDiffQuerry.carb)
-            const caloChangeLeastDiff = -gapProtein/leastDiffQuerry.unit * (leastDiffQuerry.protein * 4 + 9* leastDiffQuerry.fat + 4* leastDiffQuerry.carb)
-            
-            if(caloChangeLeastDiff >= caloChangeMostDiff) {
-                return {markProtein: leastDiff.mark, ingreID: leastDiff.d ,caloChangeProtein: caloChangeLeastDiff, servingTimesProtein: gapProtein/leastDiffQuerry.unit}
-            }
-            else return {markProtein: mostDiff.mark, idProtein: mostDiff.id, caloChangeProtein: caloChangeMostDiff, servingTimesProtein: gapProtein/mostDiffQuerry.unit}
+    for(var i = 0; i < sourceArray.length(); i++ ) {
+        if(sourceArray[i][0].protein - sourceArray[i][0].fat > mostDiff.diffProFat) {
+                mostDiff.index = i
+                mostDiff.id = sourceArray[i][0]._id
         }
+       /*  if(sourceArray[i][0].protein - sourceArray[i][0].fat < leastDiff.diffProFat) {
+            least.index = i
+            leastDiff.id = sourceArray[i][0]._id
+        }    */
+    /*}
 
-        if(gapProtein < 0) {
-            const caloChangeUp = (-1)*gapProtein/mostDiffQuerry.unit * (mostDiffQuerry.protein * 4 + 9* mostDiffQuerry.fat + 4* mostDiffQuerry.carb)
-            return {markProtein: mostDiff.mark, idProtein: mostDiff.id, caloChangeProtein: caloChangeUp, servingTimesProtein: (-1)*gapProtein/mostDiffQuerry.unit}
-        }
+        let ingreProtein = 0
+        let caloChange = 0
+        const foodServingIndex = _.findIndex(sourceArray[mostDiff.index], function(o) {
+            o._id = mostDiff.id
+        })
+        let foodServing = sourceArray[mostDiff.index][foodServingIndex].serving
+
+        mostDiff = await ingredientModel.findById(mostDiff.id)
+        .then(data => {
+            ingreProtein = data.protein
+            mostDiff.serving = foodServing  + (gapProtein/ingreProtein)
+            caloChangeProtein = (4*(data.carb + data.fat) + 9*data.protein) * gapProtein/ingreProtein 
+            return mostDiff
+        })
+        .catch(err => console.log(err))
+
+        sourceArray[mostDiff.index][foodServingIndex].serving = mostDiff.serving
+        return {sourceArray, caloChangeProtein}
 }
 
 //Change fat-rich items
@@ -147,6 +140,7 @@ async function stepTwo (foodQueries, sourceArray, gapKcal) {
     return {foodQueries, gapKcal} // Has the ID of the fat to be removed and the id of it
 }
 
+
 function filterFoodProtein(foodArray) {
     return foodArray.map(food => food.ingreList.filter(ingre => ingre.flag === '1')); //FoodArray [[flag === 1]]
 }
@@ -162,4 +156,4 @@ function filterFoodOil(foodArray) {
 
 module.exports = {
     nutritionFactByDay
-}
+} */

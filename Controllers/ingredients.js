@@ -1,4 +1,4 @@
-const ingredientModel = require('../models/Ingredient')
+const ingredientModel = require('../Models/Ingredient')
 
 const addIngredient = ({name,unit,kcalPerUnit,protein,fat,carb,fiber}) => 
     new Promise((resolve, reject) => {

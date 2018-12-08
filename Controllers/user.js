@@ -1,4 +1,4 @@
-const userModel = require('../models/User')
+const userModel = require('../Models/User')
 
 const getAllUsers = page =>
     new Promise((resolve, reject) => {

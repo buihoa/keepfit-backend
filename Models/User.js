@@ -10,17 +10,17 @@ const UserSchema = new Schema({
     goal: {type: String, required: true},
     weight: {type: Number, required: true},
     height: {type: Number, required: true},
-    workoutHabit: {type: String, default: '0',required: true,
-    validate: {validator: validator, message: props => `${props.value} is a wrong syntax`}},
+    workoutHabit: {type: String, default: '0',required: true},
     bodyFat: {type: Number, required: true},
     macro: {protein: {type: Number}, carb: {type: Number}, fat: {type: Number}}
 });
 
-function validator (input) {
+/* function validator (input) {
     const workoutIntensity =  ['0', '1-2', '3-4', '>5']
     input = input.toLowerCase
     return workoutIntensity.includes(input)
 }
+ */
 
 UserSchema.pre("save", function(next){
     console.log(this);

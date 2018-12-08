@@ -1,4 +1,4 @@
-const foodModel = require('../models/Food')
+const foodModel = require('../Models/Food')
 
 const getAllFood = page => 
     new Promise((resolve, reject) => {
