@@ -4,8 +4,7 @@ const Schema = mongose.Schema
 const menuSchema = new Schema({
     user: {type: Schema.Types.ObjectId, ref: 'user', required: true},
     date: {type: Date, require: true, unique: true}, //TODO: Need to set hour, second,.. to 0
-    foodIDs: [{foodID: {type: Schema.Types.ObjectId, ref: 'food', required: true},
-    serving: {type: Number, required:true}}],
+    foodIDs: [{type: Schema.Types.ObjectId, ref: 'food', required: true}],
     totalKcal: {type: Number},
     protein: {type: Number},
     carb: {type: Number},

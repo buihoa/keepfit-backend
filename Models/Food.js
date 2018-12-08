@@ -5,7 +5,7 @@ const FoodSchema = new Schema({
     foodName: {type: String, required: true},
     ingreList: {type: [{ingredientID: {type: Schema.Types.ObjectId, 
         ref: 'ingredient', required: true}, 
-        serving:{type: Number, default: 1, required: true} ,
+        serving:{type: Number, required: true} ,
         flag: {type: Number, 
             required: true,
             validate: {validator: validator, message: `This has to be one of these flags below

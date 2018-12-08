@@ -1,5 +1,4 @@
 const foodModel = require('../models/Food')
-const ingredientModel = require('../models/Ingredient')
 
 const getAllFood = page => 
     new Promise((resolve, reject) => {
@@ -18,7 +17,7 @@ const getFoodbyName = (name) => {
         .sort({name: -1})
         .limit(15)
         .select('-flag')
-        .populate('ingreList.ingredientID', 'name unit kcalPerUnit protein fat carb fiber')
+        .populate('ingreList.ingredientID', '_id name')
         .exec()
     
     .then(data => resolve({id: data._id}))
@@ -32,7 +31,7 @@ const getFoodbyIngre = (ingredient) => {
         .sort({name: 1})
         .limit(15)
         .select('-flag')
-        .populate('ingreList.ingredientID', 'name unit kcalPerUnit protein fat carb fiber')
+        .populate('ingreList.ingredientID', '_id name')
         .exec()
     
     .then(data => resolve({id:data}))
@@ -46,7 +45,7 @@ const getFoodbyNutrition = (flag) => {
         .sort({name: -1})
         .limit(15)
         .select('-flag')
-        .populate('ingreList.ingredientID', 'name unit kcalPerUnit protein fat carb fiber')
+        .populate('ingreList.ingredientID', '_id name')
         .exec()
     .then(id => resolve({id: _id}))
     .catch(err => reject(err))
