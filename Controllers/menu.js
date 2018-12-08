@@ -1,6 +1,5 @@
 const menuModel = require('../models/Menu')
 const moment = require('moment')
-const ingredientModel = require('../Models/Ingredient')
 const macroController = require('./macro')
 
 const addMenu = ({user, menu, date}) => new Promise((resolve, reject) => {
@@ -49,19 +48,3 @@ const deleteAllMenu = ({user}) => new Promise((resolve, reject) => {
 
 
 module.exports = {addMenu, getAllMenu, getOneMenu, updateMenu, deleteAllMenu}
-
-
-.then(data => {
-    var protein = 0
-    var carb = 0 
-    var fat = 0
-    for(var i = 0; i < ingreList.length; i++) {
-        var ingreQuery = ingredientModel.findById({_id: ingreList[i]}, (err, ingreFound) => {
-            protein = protein + ingreFound.protein
-            carb = carb + ingreFound.carb
-            fat = fat + ingreFound.fat
-        })
-    }
-    const totalKcal = 4*(carb + protein) + 9*fat
-    data.update({totalKcal, protein, fat, carb}).exec()
-})
