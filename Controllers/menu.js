@@ -12,8 +12,7 @@ const getAllMenu = ({user}) => new Promise((resolve, reject) => {
     menuModel.find({user})
     .limit(7)
     .sort({date: 1})
-    .select("-modified")
-    .populate('menu.foodID', '_id foodName ingreList')
+    .populate('menu.foodIDs', '_id name ingreList')
     .exec()
     .then(data => resolve(date))
     .catch(err => reject(err))
@@ -21,8 +20,7 @@ const getAllMenu = ({user}) => new Promise((resolve, reject) => {
 
 const getOneMenu = ({user, date}) => new Promise((resolve, reject) => {
     menuModel.findOne({user, date})
-    .select("-modified")
-    .populate('menu.foodID', '_id foodName ingreList')
+    .populate('menu.foodIDs', '_id name ingreList')
     .exec()
     .then(data => resolve(data.menu))
     .catch(err => reject(err))

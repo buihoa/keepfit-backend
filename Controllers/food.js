@@ -16,7 +16,7 @@ const getFoodbyName = (name) => {
         foodModel.find({name: name}) //TODO: check lai phan array $in
         .sort({name: -1})
         .limit(15)
-        .populate('ingreList.ingredientID', '_id name')
+        .populate('ingreList.reference', '_id name')
         .select('-flag')
         .exec()
     
@@ -30,7 +30,7 @@ const getFoodbyIngre = (ingredient) => {
         foodModel.find({ingreList: {$in: ingredient}}) //TODO: check lai phan array $in
         .sort({name: 1})
         .limit(15)
-        .populate('ingreList.ingredientID', '_id name')
+        .populate('ingreList.reference', '_id name')
         .select('-flag')
         .exec()
     
