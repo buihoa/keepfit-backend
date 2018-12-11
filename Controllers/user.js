@@ -89,7 +89,7 @@ const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
     }
 }
 
-const testMACRO = macroCalculated(0, 70, 25, 1)
+const testMACRO = macroCalculated(0, 50, 25, 3)
 console.log("TEST MACRO IS: ", testMACRO)
 
 //UPDATE PASSWORD

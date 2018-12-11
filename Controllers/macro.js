@@ -56,8 +56,10 @@ const adjustMacro = (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat
         if(gapKcal >= - 100
             && gapKcal <=  100) return foodIDs
 
+        else {
+            console.log("Not satisfied yet: ", foodIDs)
+        }
         //Case when needed to change Carb
-
         resolve(foodIDs)
         reject("")
     })

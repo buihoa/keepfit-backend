@@ -4,7 +4,7 @@ const menuController = require('../Controllers/menu')
 
 router.get("/", (req,res) => {
     menuController
-    .getAllMenu(req.body) 
+    .getAllMenu() 
     .then(allMenus => res.send(allMenus))
     .catch(err => {
         console.log(err)
@@ -34,7 +34,7 @@ router.post("/", (req,res) => {
 
 router.put("/:id", (req,res) => {
     menuController
-    .updateMenu(req.body)
+    .updateMenu(req.params.id, req.body)
     .then(updatedMennu => res.send(updatedMennu))
     .catch(err => {
         console.log(err)
@@ -42,14 +42,24 @@ router.put("/:id", (req,res) => {
     })
 })
 
-router.delete("/", (req, res) => {
+router.delete("/:id", (req, res) => {
     menuController
-    .deleteAllMenu(req.body) // need to get UserID
+    .deleteAllMenu(req.body.id) // need to get UserID
     .then(id => res.send(id))
     .catch(err => {
         console.log(err)
         res.status(500).send(err)
     })
 }) 
+
+router.delete("/", (req, res) => {
+    menuController
+    .deletelMenuTable()
+    .then(data => res.send(data))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send(err)
+    })
+})
 
 module.exports = router;

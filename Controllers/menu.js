@@ -2,47 +2,58 @@ const menuModel = require('../Models/Menu')
 //const moment = require('moment')
 const macroController = require('./macro')
 
-const addMenu = ({user, menu, date}) => new Promise((resolve, reject) => {
-    menuModel.create({user, menu, date})
+const addMenu = ({user, foodIDs, date}) => new Promise((resolve, reject) => {
+    menuModel.create({user, foodIDs, date})
     .then(data => resolve(data))
     .catch(err => reject(err))
 })
 
-const getAllMenu = (user) => new Promise((resolve, reject) => {
-    menuModel.find(user)
-    .limit(7)
-    .populate('user')
-    .populate('foodIDs')
+const getAllMenu = () => new Promise((resolve, reject) => {
+    menuModel.find()
+    .populate('user', '_id macro')
+    .populate('foodIDs', '_id name ingreList totalKcal protein fat carb')
     .exec()
-    .then(data => resolve(date))
+    .then(data => resolve(data))
     .catch(err => reject(err))
 })
 
-const getOneMenu = ({user, date}) => new Promise((resolve, reject) => {
-    menuModel.findOne({user, date})
-    .populate('user')
-    .populate('foodIDs')
+const getOneMenu = (_id) => new Promise((resolve, reject) => {
+    menuModel.findOne({_id})
+    .populate('user', '_id macro ')
+    .populate('foodIDs', '_id name ingreList totalKcal protein fat carb')
     .exec()
-    .then(data => resolve(data.menu))
+    .then(data => resolve(data))
     .catch(err => reject(err))
 })
 
-const updateMenu = (user, {date, foodIDs}) => new Promise((resolve, reject) => {
-    menuModel.findOneAndUpdate(user, {date, foodIDs})  // MenuIds is an array of foodIDs selected
-    .then(data => {
-        const {totalKcal, protein, carb, fat} = macroController.nutritionFactByDay(menuIDs)
-        data.update({totalKcal, protein, carb, fat})
+const updateMenu = (_id, {foodIDs}) => new Promise((resolve, reject) => {
+    menuModel.findOneAndUpdate(_id, {foodIDs})
+    .populate('user', '_id macro ')
+    .populate('foodIDs', '_id name ingreList totalKcal protein carb fat')
+    .exec()  
+    then(data => {
+        data.foodIDs = macroController.adjustMacro(foodIDs, 
+            data.user.macro.kcal,
+            data.user.macro.protein )
     })
-    .then(data => resolve(data._id))
+    // MenuIds is an array of foodIDs selected
+    /* .then(data => {
+        
+    }) */
+    .then(data => resolve(data))
     .catch(err => reject(err))
 })
 
 
 const deleteAllMenu = ({user}) => new Promise((resolve, reject) => {
-    menuModel.findOneAndDelete({user})
+    menuModel.findOneAndDelete(user)
     .then(data => resolve(data._id))
     .catch(err => reject(err))
 })
 
-
-module.exports = {addMenu, getAllMenu, getOneMenu, updateMenu, deleteAllMenu}
+const deletelMenuTable = () => new Promise((resolve, reject) => {
+    menuModel.deleteMany()
+    .then(data => resolve("Successfully deleted Menu"))
+    .catch(err => reject(err))
+})
+module.exports = {addMenu, getAllMenu, getOneMenu, updateMenu, deleteAllMenu , deletelMenuTable}

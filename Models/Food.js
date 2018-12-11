@@ -15,7 +15,8 @@ const FoodSchema = new Schema({
     totalKcal: {type: Number} ,
     protein: {type: Number} ,
     carb: {type: Number},
-    fat: {type: Number}
+    fat: {type: Number},
+    link: {type: String}
 });
 
 module.exports = mongoose.model("food", FoodSchema);
