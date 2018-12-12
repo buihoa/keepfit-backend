@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const ingredientController = require('../controllers/ingredients')
+const ingredientController = require('../Controllers/ingredients')
 
 router.use((req, res, next) => {
     next();
