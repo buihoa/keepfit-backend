@@ -42,7 +42,6 @@ const addUser = ({
     )
     };
 
-
 const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
     let maintainKcal = 0
     if (goal === 0) {
@@ -54,7 +53,7 @@ const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
         console.log("Maintain Kcal is ", maintainKcal)
         var fatLossPercent = 0
         if (bodyFat < 22) fatLossPercent = 0.06
-        else if (23 <= bodyFat && bodyFat < 28) fatLossPercent = 0.08
+        else if (23 <= bodyFat && bodyFat < 26) fatLossPercent = 0.08
         else fatLossPercent = 0.1
         console.log("fatLossPercent: ", fatLossPercent)
 
@@ -89,7 +88,7 @@ const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
     }
 }
 
-const testMACRO = macroCalculated(0, 50, 25, 3)
+const testMACRO = macroCalculated(0, 95, 30, 3)
 console.log("TEST MACRO IS: ", testMACRO)
 
 //UPDATE PASSWORD

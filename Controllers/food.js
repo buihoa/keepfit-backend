@@ -22,14 +22,18 @@ const getFoodbyID = (id) =>
         data.protein = 0
         data.carb = 0
         data.fat = 0
+        console.log("HERE IS ", data.ingreList)
         for(var i = 0; i < data.ingreList.length; i++ ) {
             data.totalKcal = data.totalKcal + data.ingreList[i].reference.kcalPerUnit
             data.protein = data.protein + data.ingreList[i].reference.protein
             data.carb = data.carb + data.ingreList[i].reference.carb
             data.fat = data.fat + data.ingreList[i].reference.fat
         }
-        data.save()
-        resolve(data)
+
+        return data.save()
+    })
+    .then((updated) => {
+        resolve(updated)
     })
     .catch(err => reject(err))
 })
@@ -71,23 +75,26 @@ const addFood = ({name, ingreList}) =>
 
 const updateFood = (id, {name, ingreList}) => 
     new Promise((resolve, reject) => {
+        console.log("update")
         const reqBody = {name, ingreList}
         getFoodbyID(id)
-        .then(data => {
-            if (data === null) {
-                res.status(404).json({
-                    success: 0,
-                    message: "Not found!"
-                })
-            }
-            for (key in reqBody) {
-                if (data[key] && reqBody[key]) data[key] = reqBody[key]
-            }
-            data.save()
-            resolve(data)
-        .catch(err => reject(err))
+            .then(data => {
+                if (data === null) {
+                    res.status(404).json({
+                        success: 0,
+                        message: "Not found!"
+                    })
+                }
+                for (key in reqBody) {
+                    if (data[key] && reqBody[key]) data[key] = reqBody[key]
+                }
+                return data.save()
+            })
+            .then((updated) => {
+                resolve(updated)
+            })
+            .catch(err => reject(err))
     })
-})
 
 
 const deleteFood = (id) => 

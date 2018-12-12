@@ -3,16 +3,7 @@ const ingredientModel = require('../Models/Ingredient')
 const addIngredient = ({name,unit,kcalPerUnit,protein,fat,carb,fiber}) => 
     new Promise((resolve, reject) => {
         ingredientModel
-        .findOne({name,unit,kcalPerUnit,protein,fat,carb,fiber})
-        .then(data => {
-            if(data) return "Already exist"
-            else {
-                ingredientModel.create ({
-                    name: name.toLowerCase(),
-                    unit,kcalPerUnit,protein,fat,carb,fiber
-                }).save()
-            }
-        })
+        .create({name,unit,kcalPerUnit,protein,fat,carb,fiber})
         .then(data => resolve(data._id))
         .catch(err => reject(err));
         });
@@ -60,7 +51,7 @@ const viewAllIngredients = () =>
 
 const viewOneIngredient = id => 
     new Promise((resolve, reject) => {
-        ingredientModel.findOne({name})
+        ingredientModel.findById({_id: id})
         .select('-active')
         .exec()
         .then(data => resolve(data))

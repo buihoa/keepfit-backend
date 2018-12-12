@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const Material = new Schema({
-    reference: { type: Schema.Types.ObjectId, ref: "ingredient", require: true },
+    reference: {type: Schema.Types.ObjectId, ref: "ingredient", require: true },
     serving:{type: Number, required: true},
     flag: {type: Number, required: true} // value in {0, 1, 2, 3, 4}
 }, {

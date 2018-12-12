@@ -32,7 +32,7 @@ router.get("/:id", async(req, res) => {
 
 router.post("/", (req, res) => {
     ingredientController
-    .addIngredient(res.body)
+    .addIngredient(req.body)
     .then(newID => res.send(newID))
     .catch(err => {
         console.log(err)

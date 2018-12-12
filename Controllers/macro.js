@@ -2,165 +2,254 @@ const ingredientModel = require('../Models/Ingredient')
 const foodModel = require('../Models/Food')
 const _ = require('lodash')
 const ingredientController = require('./ingredients')
-
+const foodController = require('./food')
 //Pass down the menu selected from Menu Controller
-const adjustMacro = (foodIDs, {macroTotalKcal, macroProtein, macroCarb, macroFat}) => { 
-    new Promise((resolve, reject) => {
-        const foodQueries = []
-        for(let i = 0; i < foodIDs.length; i ++) {
-            foodModel.findById({_id: foodIDs[i]}, (err, foodFound) => { //foodIDs[]
-                if(!foodFound) reject("Invalid FoodID")
-                else {
-                    foodQueries.push(foodFound) // FoodQueries[foodItem from food Models]
-                }
-            })
-        }
+const adjustMacro = (foodIDs, {
+    macroTotalKcal,
+    macroProtein
+}) => new Promise(async (resolve, reject) => {
+    try {
+        let foodQueries = await getFoodQueries(foodIDs)
+        console.log("Food Queries is: ", foodQueries[0].ingreList[0])
+        console.log("Food Queries is: ", foodQueries[0].ingreList[0].reference)
 
-        //Getting target in to const
-        const {curTotalKcal, curProtein, curCarb, curFat} = defaultNutrition(foodQueries)
-        const gapProtein  = curProtein - macroProtein
-        
+        const {
+            curTotalKcal,
+            curProtein,
+            curCarb,
+            curFat
+        } = await defaultNutrition(foodQueries)
 
-        let proteinSource = filterFoodProtein(foodQueries)
-        const carbSource = filterFoodCarb(foodQueries)
-        const fatSource = filterFoodFat(foodQueries)
-        const oilSource = filterFoodOil(foodQueries)
-        console.log("Protein, Carb, Fat, Oil: ", proteinSource, carbSource, fatSource, oilSource)
-
-        if(curProtein >= macroProtein - 5 
-            && curProtein <= macroProtein + 5
-            && curTotalKcal >= macroTotalKcal - 100
-            && curTotalKcal <= macroTotalKcal + 100) return foodIDs
-
-        //Case when they lack Protein// over Protein
-        
-        proteinSource = stepOne(proteinSource, gapProtein).sourceArray
-
+        const gapProtein = curProtein - macroProtein
         let gapKcal = curTotalKcal - macroTotalKcal
-        + stepOne(proteinSource, gapProtein).caloChangeProtein
 
-        console.log("Gap Kcal after Step 1 is: ", gapKcal)
+        let proteinSource = await filterFoodProtein(foodQueries.slice())
+        let carbSource = await filterFoodCarb(foodQueries.slice())
+        let fatSource = await filterFoodFat(foodQueries.slice())
+        let oilSource = await filterFoodOil(foodQueries.slice())
 
-        foodIDs = updateFoodID(foodIDs, proteinSource)
-        //TODO: Update the foodIDs with protein
-        if(curProtein >= macroProtein - 5 
-            && curProtein <= macroProtein + 5
-            && gapKcal > -100
-            && gapKcal < 100) return foodIDs
+ 
+
+        proteinSource = removeEle(proteinSource)
+        carbSource = removeEle(carbSource)
+        fatsource = removeEle(fatSource)
+        oilSource = removeEle(oilSource)
+
+        console.log("Protein", proteinSource)
+        console.log("Protein", carbSource)
+        console.log("Protein", fatSource)
+        console.log("Protein", oilSource)
+
+        if (curProtein >= macroProtein - 5 &&
+            curProtein <= macroProtein + 5 &&
+            curTotalKcal >= macroTotalKcal - 100 &&
+            curTotalKcal <= macroTotalKcal + 100) return foodQueries
+
+        const stepOneVar = await stepOne(foodQueries, proteinSource, gapProtein, gapKcal)
+        foodQueries = stepOneVar.foodQueries
+        gapKcal = stepOneVar.gapKcal
 
 
-        //Case when over/not enough Calorie
-        fatSource = stepTwo(fatSource, gapKcal)
-        foodIDs = updateFoodID(foodIDs, fatSource)
 
-        if(gapKcal >= - 100
-            && gapKcal <=  100) return foodIDs
+        console.log("After step 1 FoodIDs: ", foodQueries, gapKcal)
+        if (curTotalKcal >= macroTotalKcal - 100 &&
+            curTotalKcal <= macroTotalKcal + 100) return foodIDs
 
-        else {
-            console.log("Not satisfied yet: ", foodIDs)
+        const stepTwoVar = await stepTwo(foodIDs, fatSource, gapProtein, gapKcal)
+        const stepThreeVar = await stepTwo(foodIDs, fatSource, gapProtein, gapKcal)
+
+        resolve(foodQueries)
+    } catch (e) {
+        reject(e)
+    }
+})
+
+const updateCalo = (gapKcal, caloChange) => new Promise((resolve, reject) => {
+    if (gapKcal < 0) {
+        gapKcal = gapKcal + caloChange
+    } else gapKcal = gapKcal - caloChange
+    return gapKcal
+})
+
+const getFoodQueries = (foodIDs) => new Promise(async (resolve, reject) => {
+    let foodQueries = []
+    try {
+        for (let i = 0; i < foodIDs.length; i++) {
+            let temp = await foodModel.findById(foodIDs[i])
+            .populate({
+                path: 'ingreList.reference',
+                model: 'ingredient'
+            })
+            .lean();
+            console.log("Temp is ", temp)
+            if (!temp) reject("Invalid FoodID")
+            else {
+                foodQueries.push(temp) // FoodQueries[foodItem from food Models]
+            }
         }
-        //Case when needed to change Carb
-        resolve(foodIDs)
-        reject("")
-    })
-}
+        resolve(foodQueries)
+    } catch (e) {
+        reject(e)
+    }
+})
 
 
-const updateFoodID = (foodIDs, sourceArray) => {
-    for(let i = 0; i < foodIDs.length; i ++) {
-        for(let j = 0; j < sourceArray.length; j++ ) {
-            const index = _.findIndex(foodIDs[i].ingreList, function(o) {
-                o.reference._id === sourceArray[i][j].reference._id
-            })        
-            foodIDs[i][index].serving = sourceArray[i][j].serving
+const updateFoodID = (foodQueries, sourceArray) => new Promise((resolve, reject) => {
+    for (let i = 0; i < foodQueries.length; i++) {
+        for (let j = 0; j < sourceArray.length; j++) {
+            const index = _.findIndex(foodQueries[i].ingreList, function (o) {
+                return o.reference._id === sourceArray[j].reference._id &&
+                    o.reference.flag === sourceArray[j].reference.flag
+            })
+            if (index != -1) {
+                foodQueries[i].ingreList[index] = sourceArray[j]
+                break
+            }
         }
     }
-    return foodIDs
+    resolve(foodQueries)
+})
+
+const removeEle = (doubleArray) => {
+    for (let i = 0; i < doubleArray.length; i++) {
+        if (doubleArray[i].length == 0) {
+            doubleArray.splice(i, 1)
+        }
+    }
+    return doubleArray
 }
 
-const defaultNutrition = async (foodQueries) => {
-        let curProtein = 0
-        let curCarb = 0 
-        let curFat = 0
-        for(let i = 0; i < foodQueries.length; i++) {
-            for(let j = 0; j < foodQueries[i].ingreList.length; j++) {
-                let ingreQuery = await ingredientModel.findById({_id: foodQueries[i].ingreList[j].reference}, 
-                    (err, ingreFound) => {
-                    protein = protein + ingreFound.protein
-                    carb = carb + ingreFound.carb
-                    fat = fat + ingreFound.fat
-                })
-            }
-            }
-        const curTotalKcal = 4*(carb + protein) + 9*fat
-        return {curTotalKcal, curProtein, curCarb, curFat}
+const defaultNutrition = (foodQueries) => new Promise((resolve, reject) => {
+    let curProtein = 0
+    let curCarb = 0
+    let curFat = 0
+    let curTotalKcal = 0
+    for (let i = 0; i < foodQueries.length; i++) {
+        curProtein = curProtein + foodQueries[i].protein
+        curCarb = curCarb + foodQueries[i].carb
+        curFat = curFat + foodQueries[i].fat
+        curTotalKcal = curTotalKcal + foodQueries[i].totalKcal
     }
-
+    resolve({
+        curTotalKcal,
+        curProtein,
+        curCarb,
+        curFat
+    }) 
+})
 
 //Fixing Protein Intake to fit the protein
-function stepOne(sourceArray, gapProtein) { //sourceArray [[{reference: {}}, serving, flag},...],[],[]]
-    for(let i = 0; i < sourceArray.length; i++) {
-        _.orderBy(sourceArray[i], function(o) {return (o.reference.protein - o.reference.fat)}, 'desc')
+const stepOne = (foodQueries, sourceArray, gapProtein, gapKcal) => new Promise((resolve, reject) => {
+    sourceArray = _.flattenDeep(sourceArray)
+
+
+    // for(let i =0 ; i < sourceArray.length; i++) {
+    //     sourceArray[i].reference = ingredientController.viewOneIngredient(sourceArray[i].referece)
+    //     console.log("After change:", sourceArray)
+    // }
+
+    // console.log("Array in Change: ", sourceArray)
+
+    console.log("STEP ONE ARRAY: ", sourceArray[0])
+
+    _.orderBy(sourceArray, function (o) {
+        return (o.reference.protein - o.reference.fat)
+    }, 'desc')
+
+    console.log("Source Array after orderBY: ", sourceArray)
+
+    const mostDiff = {
+        index: 0,
+        id: 0,
+        serving: 0,
+        diff: 0
     }
 
-    const mostDiff = {index: 0, id: 0, serving: 0, diff: 0}
+    const servingChange = gapProtein / sourceArray[0].reference.protein
+    const caloPerUnit = 9 * sourceArray[0].reference.fat +
+        4 * (sourceArray[0].reference.protein + sourceArray[0].reference.carb)
+    const caloChangeProtein = servingChange * caloPerUnit
 
-    mostDiff.diff = sourceArray[0][sourceArray[0].length-1].protein -sourceArray[0][sourceArray[0].length-1].fat
+    foodQueries = updateFoodID(foodQueries, sourceArray[0])
+    gapKcal = updateCalo(gapKcal, caloChangeProtein)
 
-    for(let i = 0; i < sourceArray.length; i++ ) {
-        if(sourceArray[i][0].protein - sourceArray[i][0].fat 
-            > mostDiff.diffProFat) {
-                mostDiff.index = i
-                mostDiff.id = sourceArray[i][0].reference
-                mostDiff.serving = sourceArray[i][0].serving
-        }  
-    }
+    resolve({
+        foodQueries,
+        gapKcal
+    })
+})
+// for (let i = 0; i < sourceArray.length; i++) {
+//     for (let j = 0; j < sourceArray[i]; j++) {
+//         sourceArray[i][j].reference = ingredientController.viewOneIngredient(sourceArray[i][j].reference)
+//     }
+// }
 
-    const servingChange = gapProtein/sourceArray[mostDiff.index][0].reference.protein
-    sourceArray[mostDiff.index][0].serving = sourceArray[mostDiff.index][0].serving + servingChange
-    const caloChangeProtein = 9 * servingChang
-    
-        console.log("Fixed Protein Source Array",sourceArray)
-        return {sourceArray, caloChangeProtein}
-}
 
 //Change fat-rich items, take out the fattest ingredients
-async function stepTwo (sourceArray, gapKcal) {
-    for(let i = 0; i < sourceArray.length; i ++) {
-        _.orderBy(sourceArray, 'fat', 'desc')
+const stepTwo = (foodQueries, sourceArray, gapKcal) => new Promise((resolve, reject) => {
+    sourceArray = _.flattenDeep(sourceArray)
+    _.orderBy(sourceArray, 'reference.fat', 'desc')
+    console.log("Fat Array after orderby: ", sourceArray)
+    const servingChangeFat = Math.floor(gapKcal / (sourceArray[0].reference.fat * 9) * 10) / 10
+
+    const caloChange = servingChangeFat *
+        (4 * (sourceArray[0].reference.protein + sourceArray[0].referece.carb +
+            sourceArray[0].reference.fat * 9))
+
+    console.log("before changing fat Source is: ", sourceArray[0])
+    sourceArray[0].serving = sourceArray[0].serving + servingChangeFat
+    console.log("after changing fat Source is: ", sourceArray[0])
+
+    updateFoodID(foodQueries, sourceArray[0])
+    gapKcal = updateCalo(gapKcal, caloChange)
+
+    return {
+        foodQueries,
+        gapKcal
+    } // Has the ID of the fat to be removed and the id of it
+})
+
+const stepThree = (sourceArray, gapKcal) => new Promise((resolve, reject) => {
+    for (let i = 0; i < sourceArray.length; i++) {
+        for (let j = 0; j < sourceArray[i]; j++) {
+            sourceArray[i][j].reference = ingredientController.viewOneIngredient(sourceArray[i][j].reference)
+        }
     }
+    _.flatMap(sourceArray)
+    _.orderBy(sourceArray, 'reference.carb', 'desc')
 
-        const ingreQuery = await ingredientModel.findById(sourceArray[0].reference)
-        let servingChangeFat = Math.floor(gapKcal/(ingreQuery.fat * 9)*10)/10
 
-        sourceArray[0].serving = sourceArray[0].serving + servingChangeFat
-        gapKcal = gapKcal - gapKcal/(ingreQuery.fat * 9)
+    const serveChangeCarb = Math.floor(gapKcal / 4 / sourceArray[0].serving / sourceArray[0].reference.carb * 10) / 10
 
-    return {sourceArray, gapKcal} // Has the ID of the fat to be removed and the id of it
-}
+    const caloChange = servingChangeFat *
+        (4 * (sourceArray[0].reference.protein + sourceArray[0].referece.carb +
+            sourceArray[0].reference.fat * 9))
 
-function stepThree(sourceArray, gapKcal) {
-    for(let i = 0; i < sourceArray.length; i ++) {
-        _.orderBy(sourceArray[i], function(o) {
-            return 
-        })
+    updateFoodID(foodIDs, sourceArray[0])
+    gapKcal = updateCalo(gapKcal, caloChange)
+
+    return {
+        foodIDs,
+        gapKcal
     }
-    return sourceArray
-}
+})
 
 function filterFoodProtein(foodArray) {
-    foodArray.map(food => food.ingreList.filter(ingre => ingre.flag === '1')); //FoodArray [[flag === 1]]
+    return foodArray.map(food => food.ingreList.filter(ingre => ingre.flag === 1))
 }
+
 function filterFoodCarb(foodArray) {
-    return foodArray.map(food => food.ingreList.filter(ingre => ingre.flag === '2'));
+    return foodArray.map(food => food.ingreList.filter(ingre => ingre.flag === 2))
 }
+
 function filterFoodFat(foodArray) {
-    return foodArray.map(food => food.ingreList.filter(ingre => ingre.flag === '3'));
+    return foodArray.map(food => food.ingreList.filter(ingre => ingre.flag === 3))
 }
+
 function filterFoodOil(foodArray) {
-    return foodArray.map(food => food.ingreList.filter(ingre => ingre.flag === '4'));
+    return foodArray.map(food => food.ingreList.filter(ingre => ingre.flag === 4))
 }
 
 module.exports = {
-    adjustMacro, stepOne, stepTwo, stepThree
-}     
+    adjustMacro
+}
