@@ -190,15 +190,18 @@ const stepTwo = (foodQueries, sourceArray, gapKcal) => new Promise((resolve, rej
     sourceArray = _.flattenDeep(sourceArray)
     _.orderBy(sourceArray, 'reference.fat', 'desc')
     console.log("Fat Array after orderby: ", sourceArray)
-    const servingChangeFat = Math.floor(gapKcal / (sourceArray[0].reference.fat * 9) * 10) / 10
 
-    const caloChange = servingChangeFat *
-        (4 * (sourceArray[0].reference.protein + sourceArray[0].referece.carb +
-            sourceArray[0].reference.fat * 9))
+    //const servingChangeFat = Math.floor(gapKcal /(sourceArray[0].reference.fat * 9) * 10) / 10
+
+    const caloChange = servingChangeFat * (4 * (sourceArray[0].reference.protein 
+        + sourceArray[0].reference.carb) +
+            sourceArray[0].reference.fat * 9)
 
     console.log("before changing fat Source is: ", sourceArray[0])
+    console.log(sourceArray[0].serving)
+    console.log(servingChangeFat)
     sourceArray[0].serving = sourceArray[0].serving + servingChangeFat
-    console.log("after changing fat Source is: ", sourceArray[0])
+    //console.log("after changing fat Source is: ", sourceArray[0])
 
     updateFoodID(foodQueries, sourceArray[0])
     gapKcal = updateCalo(gapKcal, caloChange)
