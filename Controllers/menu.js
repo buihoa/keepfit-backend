@@ -52,25 +52,13 @@ const updateMenu = (_id, {foodIDs}) => new Promise((resolve, reject) => {
         }
     })
     .exec()  
-    .then(data => {
-        console.log("INside MENU: ", data)
-       
-        foodQuery =  macroController.adjustMacro(foodIDs, 
+    .then(data => 
+        resolve(macroController.adjustMacro(foodIDs, 
             data.user.macro.kcal,
-            data.user.macro.protein)
-
-        for(let i = 0; i < data.foodIDs.length; i ++) {
-            data.foodIDs[i] = foodQuery[i]
-        }
-        data.save()
-    })
-    // MenuIds is an array of foodIDs selected
-    /* .then(data => {
-        
-    }) */
-    .then(data => resolve(data))
+            data.user.macro.protein)))
     .catch(err => reject(err))
 })
+
 
 const deleteAllMenu = ({user}) => new Promise((resolve, reject) => {
     menuModel.findOneAndDelete(user)
@@ -83,4 +71,5 @@ const deletelMenuTable = () => new Promise((resolve, reject) => {
     .then(data => resolve("Successfully deleted Menu"))
     .catch(err => reject(err))
 })
+
 module.exports = {addMenu, getAllMenu, getOneMenu, updateMenu, deleteAllMenu , deletelMenuTable}

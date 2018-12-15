@@ -42,9 +42,8 @@ const viewAllIngredients = () =>
     new Promise ((resolve, reject) => {
         ingredientModel.find({active: true})
         .sort({kcalPerUnit: 'asc'})
-        .limit(20)
         .exec()
-        .then(data => resolve({id:data})) //TODO: Look at this later
+        .then(data => resolve(data)) //TODO: Look at this later
         .catch(err => reject(err))
     })
 
@@ -59,7 +58,7 @@ const viewOneIngredient = id =>
     })
 
 
-const updateIngredient = (id) => 
+const updateIngredient = (id, {name, unit, kcalPerUnit, protein, fat, carb, fiber, active}) => 
     new Promise((resolve, reject) => {
         const reqBody = {name, unit, kcalPerUnit, protein, fat, carb, fiber, active}
     ingredientModel.findOne({_id: id})
