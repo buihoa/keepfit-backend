@@ -53,17 +53,15 @@ const adjustMacro = (foodIDs,
             curTotalKcal <= macroTotalKcal + 100) resolve(foodQueries)
 
         
-        //const stepTwoVar = await stepTwo(foodIDs, fatSource, gapProtein, gapKcal)
+        const stepTwoVar = await stepTwo(foodIDs, fatSource, gapProtein, gapKcal)
+        foodQueries = stepTwoVar.foodQueries
+        gapKcal = stepTwoVar.gapKcal
         //const stepThreeVar = await stepTwo(foodIDs, fatSource, gapProtein, gapKcal)
 
         resolve(foodQueries)
     } catch (e) {
         reject(e)
     }
-})
-
-const suggestCompleteMenu = (macroCalo) => new Promise((resolve, reject) => {
-    
 })
 
 const updateCalo = (gapKcal, caloChange)  => {
