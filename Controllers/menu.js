@@ -4,7 +4,20 @@ const macroController = require('./macro')
 
 const addMenu = ({user, foodIDs, date}) => new Promise((resolve, reject) => {
     menuModel.create({user, foodIDs, date})
-    .then(data => resolve(data))
+    .populate('user', '_id macro ')
+    .populate({
+        path: 'foodIDs',
+        select: '_id name ingreList totalKcal protein fat carb',
+        populate: {
+            path: 'ingreList.reference',
+            model: 'ingredient'
+        }
+    })
+    .exec()  
+    .then(data => 
+        resolve(macroController.adjustMacro(foodIDs, 
+            data.user.macro.kcal,
+            data.user.macro.protein)))
     .catch(err => reject(err))
 })
 
