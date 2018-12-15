@@ -1,8 +1,6 @@
-const ingredientModel = require('../Models/Ingredient')
 const foodModel = require('../Models/Food')
 const _ = require('lodash')
 const ingredientController = require('./ingredients')
-const foodController = require('./food')
 //Pass down the menu selected from Menu Controller
 const adjustMacro = (foodIDs,
     macroTotalKcal,
@@ -198,7 +196,7 @@ const stepTwo = (foodQueries, sourceArray, gapKcal) => new Promise((resolve, rej
         let countCalo = 0
     }
     console.log(servingChangeFat)
-    
+    ''
 
     updateFoodID(foodQueries, sourceArray[0])
     gapKcal = updateCalo(gapKcal, caloChange)

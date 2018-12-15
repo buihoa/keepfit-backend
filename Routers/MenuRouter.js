@@ -34,7 +34,7 @@ router.post("/", (req,res) => {
 
 router.put("/:id", (req,res) => {
     menuController
-    .updateMenu(req.params.id, req.body)
+    .updateMenu(req.body.user, req,body.date, req.body.foodIDs)
     .then(updatedMennu => res.send(updatedMennu))
     .catch(err => {
         console.log(err)

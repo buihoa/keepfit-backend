@@ -40,8 +40,8 @@ const getOneMenu = (_id) => new Promise((resolve, reject) => {
     .catch(err => reject(err))
 })
 
-const updateMenu = (_id, {foodIDs}) => new Promise((resolve, reject) => {
-    menuModel.findOneAndUpdate(_id, {foodIDs})
+const updateMenu = ({user,date}, {foodIDs}) => new Promise((resolve, reject) => {
+    menuModel.findOneAndUpdate({user, date}, {foodIDs})
     .populate('user', '_id macro ')
     .populate({
         path: 'foodIDs',
