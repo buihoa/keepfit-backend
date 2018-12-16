@@ -65,11 +65,11 @@ app.get("/api", (req, res) => {
     req.session.username = "dongonson"
     console.log(req.session);
     console.log(req.sessionID);
-    res.send("LOL")
+    res.send("HELLO!")
 })
 
 app.get("/", (req, res) => {
-    res.sendFile("./public/index.html");
+    res.redirect("/login");
 })
 
 const port = process.env.PORT || 8888;

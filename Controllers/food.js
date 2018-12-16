@@ -66,9 +66,9 @@ const getFoodbyIngre = (ingredient) => {
 })
 } */
 
-const addFood = ({name, ingreList}) => 
+const addFood = ({name, ingreList, totalKcal, protein, carb, fat, link}) => 
     new Promise((resolve, reject) => {
-        foodModel.create({name, ingreList})
+        foodModel.create({name, ingreList,totalKcal, protein, carb, fat,link})
     .then(data => resolve(data))
     .catch(err => reject(err))
 })
@@ -104,6 +104,14 @@ const deleteFood = (id) =>
         .catch(err => reject(err))
     })
 
+const deleteAllFood = () => new Promise((resolve, reject) => {
+    foodModel.deleteMany()
+    .then(data => resolve(data))
+    .catch(err => reject(err))
+})
+
+
 module.exports = {
-    addFood,getFoodbyID, deleteFood, updateFood, getAllFood
+    addFood,getFoodbyID, deleteFood, updateFood, getAllFood, deleteAllFood
 }
+

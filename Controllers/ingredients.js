@@ -75,7 +75,13 @@ const updateIngredient = (id, {name, unit, kcalPerUnit, protein, fat, carb, fibe
     .catch(err => reject(err))
     });
 
+const deleteAllIngredient = () => new Promise((resolve, reject) => {
+        ingredientModel.deleteMany()
+        .then(data => resolve(data))
+        .catch(err => reject(err))
+})
 
 module.exports = {
-    addIngredient, deleteIngredient, viewAllIngredients, viewOneIngredient, updateIngredient
+    addIngredient, deleteIngredient, viewAllIngredients, viewOneIngredient, updateIngredient,
+    deleteAllIngredient
 }

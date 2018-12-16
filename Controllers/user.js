@@ -8,9 +8,7 @@ const getAllUsers = page =>
             .skip((page - 1) * 5)
             .select('-hashPassword -intro')
             .exec()
-            .then(data => resolve({
-                data
-            }))
+            .then(data => resolve({data}))
             .catch(err => reject(err));
     });
 
@@ -119,10 +117,7 @@ const updateUser = (id, {
             })
             .then(data => {
                 if (data === null) {
-                    res.status(404).json({
-                        success: 0,
-                        message: "Not found!"
-                    })
+                    console.log("Not found user")
                 }
                 for (key in reqBody) {
                     if (data[key] && reqBody[key]) data[key] = reqBody[key]

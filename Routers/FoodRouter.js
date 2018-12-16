@@ -74,4 +74,13 @@ router.delete("/:id", (req, res) => {
     })
 })
 
+router.delete("/", (req, res) => {
+    foodController.deleteAllFood()
+    .then(data => res.send(data))
+    .catch(err => {
+        console.log(err);
+        res.status(500).send(err);
+    })
+})
+
 module.exports = router;

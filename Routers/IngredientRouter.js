@@ -50,12 +50,21 @@ router.put("/:id", (req, res) => {
     })
 })
 
-router.delete("/:id", async(req, res) => {
+router.delete("/:id", (req, res) => {
     const ingredientID = req.params.id;
 
     ingredientController
     .deleteIngredient(ingredientID)
     .then(id => res.send(id))
+    .catch(err => {
+        console.log(err)
+        res.status(500).send(err)
+    })
+})
+
+router.delete('/', (req, res) => {
+    ingredientController.deleteAllIngredient()
+    .then(data => res.send(data))
     .catch(err => {
         console.log(err)
         res.status(500).send(err)
