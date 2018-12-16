@@ -69,7 +69,7 @@ const updateIngredient = (id, {name, unit, kcalPerUnit, protein, fat, carb, fibe
         for(key in reqBody) {
             if(data[key] && reqBody[key]) data[key] = reqBody[key]
         }
-        data.save().exec()
+        data.save()
     })
     .then(data => resolve(data))
     .catch(err => reject(err))

@@ -7,12 +7,15 @@ const UserSchema = new Schema({
     hashPassword: {type: String, require: true},
     avatar: {type: String},
     intro: {type: String},
-    goal: {type: String},
-    weight: {type: Number},
-    height: {type: Number},
-    workoutHabit: {type: String, default: '0'},
-    bodyFat: {type: Number},
-    macro: {kcal: {type: Number}, protein: {type: Number}, carb: {type: Number}, fat: {type: Number}}
+    goal: {type: Number, default: 0},
+    weight: {type: Number, default: 1},
+    height: {type: Number, default: 1},
+    workoutHabit: {type: Number, default: 1},
+    bodyFat: {type: Number, default: 1},
+    macro: {kcal: {type: Number, default: 0}, 
+    protein: {type: Number, default: 0}, 
+    carb: {type: Number, default: 0}, 
+    fat: {type: Number, default: 0}}
 });
 
 /* function validator (input) {

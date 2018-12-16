@@ -44,10 +44,9 @@ router.put("/:id", (req, res) => {
     })
 })
 
-router.delete("/:id", async(req, res) => {
-    const userId = req.params.id;
+router.delete("/:id", (req, res) => {
     userController
-    .deleteUser(req.param.id)
+    .deleteUser(req.params.id)
     .then(id => res.send(id))
     .catch(err => {
         console.log(err)

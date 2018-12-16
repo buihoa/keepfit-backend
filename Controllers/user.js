@@ -86,7 +86,7 @@ const macroCalculated = (goal, weight, bodyFat, workoutHabit) => {
     }
 }
 
-const testMACRO = macroCalculated(0, 95, 30, 3)
+const testMACRO = macroCalculated(0, 50, 20, 3)
 console.log("TEST MACRO IS: ", testMACRO)
 
 //UPDATE PASSWORD
@@ -94,7 +94,6 @@ const updateUser = (id, {
         name,
         avatar,
         intro,
-        goal,
         weight,
         height,
         workoutHabit,
@@ -105,7 +104,6 @@ const updateUser = (id, {
         name,
         avatar,
         intro,
-        goal,
         weight,
         height,
         workoutHabit,
@@ -119,33 +117,27 @@ const updateUser = (id, {
                 if (data === null) {
                     console.log("Not found user")
                 }
-                for (key in reqBody) {
-                    if (data[key] && reqBody[key]) data[key] = reqBody[key]
-                }
 
-                if(data[goal] && data[weight]
-                    && data[workoutHabit && data[bodyFat]]) {
-                        data.macro = macroCalculated(data[goal], data[weight], data[bodyFat], data[workoutHabit])
-                    }
-                
+                for(key in reqBody) {
+                    console.log("DATA KEY: ", data[key])
+                    console.log("BODY KEY: ", reqBody[key])
+                    if (data[key] && reqBody[key]) {
+                        data[key] = reqBody[key]
+                    } 
+                    
+                }
+                data.macro = macroCalculated(0, data.weight, data.bodyFat, data.workoutHabit)
                 data.save()
+                resolve(data)
             })
-            .then(data => resolve({
-                data
-            }))
             .catch(err => reject(err));
         })
     };
 
-
-const deleteUser = ({
-        id
-    }) =>
+const deleteUser = (id) =>
     new Promise((resolve, reject) => {
         userModel.findByIdAndDelete(id)
-            .then(data => resolve({
-                id: data_id
-            }))
+            .then(data => resolve(data))
             .catch(err => reject(err));
     });
 

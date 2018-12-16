@@ -73,10 +73,10 @@ const addFood = ({name, ingreList, totalKcal, protein, carb, fat, link}) =>
     .catch(err => reject(err))
 })
 
-const updateFood = (id, {name, ingreList}) => 
+const updateFood = (id, {name, ingreList, totalKcal, protein, carb, fat, link}) => 
     new Promise((resolve, reject) => {
         console.log("update")
-        const reqBody = {name, ingreList}
+        const reqBody = {name, ingreList, totalKcal, protein, carb, fat, link}
         getFoodbyID(id)
             .then(data => {
                 if (data === null) {
